@@ -1,0 +1,70 @@
+name: sync-binaries
+
+# 从 jimhy/engram 的 Release 拉取四平台引擎二进制，提交进 plugin/bin/。
+# 引擎源码只在 jimhy/engram 一份（可移植内核，跨 CLI 零改动共享）——本仓库
+# 零编译、零源码，只复用上游 CI 的交叉编译产物。
+#
+# 触发：
+#   - repository_dispatch(engram-release)：jimhy/engram 发版后由其 release.yml
+#     自动通知（client_payload.version = 上游 tag，如 v0.1.10）。
+#   - workflow_dispatch：在 Actions 页手动跑，可传 version（默认 latest）。
+#
+# 拉取上游公开 Release 用自带的 GITHUB_TOKEN 即可（jimhy/engram 是 public）；
+# 自动级联那一步的跨仓库通知凭证配在 jimhy/engram 侧，与本 workflow 无关。
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "engram release tag to pull (e.g. v0.1.10) or 'latest'"
+        default: latest
+  repository_dispatch:
+    types: [engram-release]
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    name: sync engine binaries from jimhy/engram
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve upstream version
+        id: ver
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "repository_dispatch" ]; then
+            v="${{ github.event.client_payload.version }}"
+          else
+            v="${{ github.event.inputs.version }}"
+          fi
+          echo "version=${v:-latest}" >> "$GITHUB_OUTPUT"
+
+      - name: Download binaries from jimhy/engram release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          v="${{ steps.ver.outputs.version }}"
+          mkdir -p plugin/bin
+          if [ "$v" = "latest" ] || [ -z "$v" ]; then
+            gh release download --repo jimhy/engram --pattern 'engram-*' --dir plugin/bin --clobber
+          else
+            gh release download "$v" --repo jimhy/engram --pattern 'engram-*' --dir plugin/bin --clobber
+          fi
+          chmod +x plugin/bin/engram-linux-* plugin/bin/engram-macos-* 2>/dev/null || true
+          ls -la plugin/bin
+
+      - name: Commit refreshed binaries
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add plugin/bin
+          if git diff --cached --quiet; then
+            echo "no binary changes (already in sync)"
+          else
+            git commit -m "ci: sync engram ${{ steps.ver.outputs.version }} binaries"
+            git push
+          fi

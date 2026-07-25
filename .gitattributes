@@ -1,0 +1,11 @@
+# engram codex plugin - line-ending & binary policy
+* text=auto
+
+# engine binaries: treat as binary so line-ending conversion never corrupts them
+plugin/bin/* binary
+
+# posix shell scripts MUST stay LF (bash fails on CRLF)
+*.sh text eol=lf
+
+# powershell scripts: keep CRLF on Windows
+*.ps1 text eol=crlf

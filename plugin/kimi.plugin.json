@@ -1,0 +1,40 @@
+{
+  "name": "engram",
+  "version": "1.1.1",
+  "description": "Engram 仿人脑分层长期记忆的 Kimi Code 适配器：首条 prompt 注入记忆热索引、会话结束自动复盘巩固，并提供 engram skill 让 agent 在该检索时主动回溯记忆。单 Rust 二进制、零外部依赖。",
+  "author": {
+    "name": "jimhyliu",
+    "email": "jimhyliu@gmail.com"
+  },
+  "homepage": "https://github.com/jimhy/engram",
+  "license": "Apache-2.0",
+  "keywords": ["memory", "engram", "recall", "hooks", "rust", "long-term-memory"],
+  "skills": "./skills/",
+  "commands": "./commands/",
+  "interface": {
+    "displayName": "Engram Memory",
+    "shortDescription": "Human-like layered long-term memory for Kimi Code",
+    "longDescription": "Engram injects a memory hot-index on the first prompt of each session and runs an independent headless reviewer at session end to consolidate what mattered (promote/demote, supersede, merge). An engram skill teaches the agent recall-first: when asked what a project is, what's left to do, or whether something was handled before, it recalls from memory before scanning code. Portable Rust engine + redb store, no external services. Shares the same memory stores with the Claude Code / Codex / opencode adapters.",
+    "developerName": "jimhyliu",
+    "websiteURL": "https://github.com/jimhy/engram"
+  },
+  "hooks": [
+    {
+      "event": "SessionStart",
+      "matcher": "startup|resume",
+      "command": "bash ./scripts/kimi-session-start.sh 2>/dev/null || powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/kimi-session-start.ps1",
+      "timeout": 60
+    },
+    {
+      "event": "UserPromptSubmit",
+      "command": "bash ./scripts/kimi-prompt-hotindex.sh 2>/dev/null || powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/kimi-prompt-hotindex.ps1",
+      "timeout": 30
+    },
+    {
+      "event": "SessionEnd",
+      "matcher": "exit",
+      "command": "bash ./scripts/kimi-session-end.sh 2>/dev/null || powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/kimi-session-end.ps1",
+      "timeout": 30
+    }
+  ]
+}
