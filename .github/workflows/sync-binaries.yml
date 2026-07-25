@@ -1,6 +1,6 @@
 name: sync-binaries
 
-# 从 jimhy/engram 的 Release 拉取四平台引擎二进制，提交进 plugin/bin/。
+# 从 jimhy/engram 的 Release 拉取四平台引擎二进制，提交进 bin/。
 # 引擎源码只在 jimhy/engram 一份（可移植内核，跨 CLI 零改动共享）——本仓库
 # 零编译、零源码，只复用上游 CI 的交叉编译产物。
 #
@@ -47,21 +47,21 @@ jobs:
         shell: bash
         run: |
           v="${{ steps.ver.outputs.version }}"
-          mkdir -p plugin/bin
+          mkdir -p bin
           if [ "$v" = "latest" ] || [ -z "$v" ]; then
-            gh release download --repo jimhy/engram --pattern 'engram-*' --dir plugin/bin --clobber
+            gh release download --repo jimhy/engram --pattern 'engram-*' --dir bin --clobber
           else
-            gh release download "$v" --repo jimhy/engram --pattern 'engram-*' --dir plugin/bin --clobber
+            gh release download "$v" --repo jimhy/engram --pattern 'engram-*' --dir bin --clobber
           fi
-          chmod +x plugin/bin/engram-linux-* plugin/bin/engram-macos-* 2>/dev/null || true
-          ls -la plugin/bin
+          chmod +x bin/engram-linux-* bin/engram-macos-* 2>/dev/null || true
+          ls -la bin
 
       - name: Commit refreshed binaries
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add plugin/bin
+          git add bin
           if git diff --cached --quiet; then
             echo "no binary changes (already in sync)"
           else

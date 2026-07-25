@@ -80,13 +80,12 @@
 ## 结构
 
 ```
-plugin/                            the kimi plugin
-  kimi.plugin.json                 manifest（skills + commands + hooks）
-  scripts/                         kimi-{session-start,prompt-hotindex,session-end,launch-reviewer}.{ps1,sh}
+kimi.plugin.json                   manifest（skills + commands + hooks；须在仓库根，kimi 安装器只认根级 manifest）
+scripts/                           kimi-{session-start,prompt-hotindex,session-end,launch-reviewer}.{ps1,sh}
                                    + reviewer-prompt.md + reviewer-log.ps1
-  skills/engram/SKILL.md           engram agent 接口 + 判定 rubric
-  commands/                        /engram:{recall,list,status,render,web,root}
-  bin/                             四平台引擎二进制
+skills/engram/SKILL.md             engram agent 接口 + 判定 rubric
+commands/                          /engram:{recall,list,status,render,web,root}
+bin/                               四平台引擎二进制
 ```
 
 ## 平台

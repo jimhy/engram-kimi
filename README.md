@@ -66,13 +66,13 @@ Storage is **[redb](https://github.com/cberner/redb)** (embedded, single-file, A
 ## Layout
 
 ```
-plugin/                            the kimi plugin
-  kimi.plugin.json                 manifest (skills + commands + hooks)
-  scripts/                         kimi-{session-start,prompt-hotindex,session-end,launch-reviewer}.{ps1,sh}
+kimi.plugin.json                   manifest (skills + commands + hooks; must sit at the repo
+                                   root — kimi's installer only detects root-level manifests)
+scripts/                           kimi-{session-start,prompt-hotindex,session-end,launch-reviewer}.{ps1,sh}
                                    + reviewer-prompt.md + reviewer-log.ps1
-  skills/engram/SKILL.md           engram agent interface + judgment rubric
-  commands/                        /engram:{recall,list,status,render,web,root}
-  bin/                             engine binaries for four platforms
+skills/engram/SKILL.md             engram agent interface + judgment rubric
+commands/                          /engram:{recall,list,status,render,web,root}
+bin/                               engine binaries for four platforms
 ```
 
 ## Platforms
