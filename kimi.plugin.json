@@ -1,6 +1,6 @@
 {
   "name": "engram",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Engram 仿人脑分层长期记忆的 Kimi Code 适配器：首条 prompt 注入记忆热索引、会话结束自动复盘巩固，并提供 engram skill 让 agent 在该检索时主动回溯记忆。单 Rust 二进制、零外部依赖。",
   "author": {
     "name": "jimhyliu",
