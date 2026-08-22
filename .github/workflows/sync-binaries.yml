@@ -41,6 +41,11 @@ jobs:
           fi
           echo "version=${v:-latest}" >> "$GITHUB_OUTPUT"
 
+      # ⚠ pattern 必须逐个平台列出，不能图省事写 'engram-*'：
+      #   上游 Release 里还有 engram-kb-* 三个 sidecar 二进制（合计约 500MB），
+      #   它们同样匹配 'engram-*'，会被一并拉进本仓库的 bin/ 并提交。
+      #   此前没出事只是**时序巧合**——历次 sync 都跑在 kb 编译完成之前，
+      #   Release 上当时还没有那几个 asset。任何时候手动重跑都可能中招。
       - name: Download binaries from jimhy/engram release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -49,9 +54,9 @@ jobs:
           v="${{ steps.ver.outputs.version }}"
           mkdir -p bin
           if [ "$v" = "latest" ] || [ -z "$v" ]; then
-            gh release download --repo jimhy/engram --pattern 'engram-*' --dir bin --clobber
+            gh release download --repo jimhy/engram --pattern 'engram-linux-*' --pattern 'engram-macos-*' --pattern 'engram-windows-*' --dir bin --clobber
           else
-            gh release download "$v" --repo jimhy/engram --pattern 'engram-*' --dir bin --clobber
+            gh release download "$v" --repo jimhy/engram --pattern 'engram-linux-*' --pattern 'engram-macos-*' --pattern 'engram-windows-*' --dir bin --clobber
           fi
           chmod +x bin/engram-linux-* bin/engram-macos-* 2>/dev/null || true
           ls -la bin
