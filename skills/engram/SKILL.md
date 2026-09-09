@@ -15,8 +15,9 @@ engram 是仿人脑的分层记忆系统：**总结当索引、按需回溯细�
 <!-- adapter:begin 适配器端特有段——引擎二进制定位（主插件版无此段；check-adapter-sync.sh 比对时会剔除 adapter:begin/end 之间的内容） -->
 ## 引擎二进制怎么调（codex / opencode / kimi 必读）
 
-下文所有 `engram` 命令指**本 plugin 自带的引擎二进制**——用户机器的 PATH 里通常没有 `engram`。先定位一次，之后把命令里的 `engram` 都换成它的绝对路径：
-- 在本 plugin 的 `bin/` 下按平台选：Windows `bin/engram-windows-x86_64.exe`；macOS `bin/engram-macos-aarch64`（Apple 芯片）或 `bin/engram-macos-x86_64`（Intel）；Linux `bin/engram-linux-x86_64`。
+下文所有 `engram` 命令都要换成引擎二进制的**绝对路径**——用户机器的 PATH 里通常没有 `engram`。先定位一次，按下面的顺序取第一个存在的：
+- **优先公共位置 `~/.engram/bin/`**（全机一份、所有 CLI 共用，与记忆库 `~/.engram/` 同目录，路径不带版本号、升级也不变）：Windows `~/.engram/bin/engram-windows-x86_64.exe`，其余平台同名换后缀。**这是最省事也最稳的一档**——插件缓存目录带版本号，升级即换、还会残留旧版目录。
+- 公共位置没有，再回落**本 plugin 自带的** `bin/`，按平台选：Windows `bin/engram-windows-x86_64.exe`；macOS `bin/engram-macos-aarch64`（Apple 芯片）或 `bin/engram-macos-x86_64`（Intel）；Linux `bin/engram-linux-x86_64`。
 - plugin 根目录：优先环境变量 `PLUGIN_ROOT`（codex 注入）；若取不到，在 `~/.codex/plugins/cache/*/engram/*/` 下找最新版本目录。
 - opencode：复盘提示词里的 `{{ENGRAM}}` 已被替换为绝对路径，直接用；手动跑时在插件包根的 `bin/` 下按平台选。
 - kimi：插件安装后会被复制到 `$KIMI_CODE_HOME/plugins/managed/engram/`（`KIMI_CODE_HOME` 缺省为 `~/.kimi-code/`），在其 `bin/` 下按平台选；例：``"$HOME/.kimi-code/plugins/managed/engram/bin/engram-linux-x86_64" resolve --format json``。

@@ -23,7 +23,16 @@ case "$(uname -s)" in
   Darwin) case "$(uname -m)" in arm64|aarch64) bin="engram-macos-aarch64" ;; *) bin="engram-macos-x86_64" ;; esac ;;
   *)      bin="engram-linux-x86_64" ;;
 esac
-engram="${ENGRAM_BIN:-$plugin_root/bin/$bin}"
+# 二进制解析三档：ENGRAM_BIN 覆盖 → 公共位置（全机一份，与 ~/.engram 库同目录、
+# 不隶属任何 CLI）→ 插件自带的兜底（离线 / 未装公共位置时）。
+shared="$HOME/.engram/bin/$bin"
+if [ -n "${ENGRAM_BIN:-}" ]; then engram="$ENGRAM_BIN"
+elif [ -f "$shared" ];      then engram="$shared"
+else                             engram="$plugin_root/bin/$bin"; fi
+# 把引擎收敛到公共位置 ~/.engram/bin（全机一份、谁新用谁）。静默 best-effort：
+# 失败绝不影响会话，上面解析出的 $engram 照常可用。
+bash "$script_dir/ensure-engram.sh" >/dev/null 2>&1 || true
+
 [ -x "$engram" ] || exit 0
 
 base="$HOME/.engram/kimi"

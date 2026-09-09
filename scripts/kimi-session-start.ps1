@@ -15,7 +15,12 @@ try {
 
     $scriptDir  = $PSScriptRoot
     $pluginRoot = if ($env:KIMI_PLUGIN_ROOT) { $env:KIMI_PLUGIN_ROOT } else { Split-Path -Parent $scriptDir }
-    $engram = if ($env:ENGRAM_BIN) { $env:ENGRAM_BIN } else { Join-Path $pluginRoot 'bin\engram-windows-x86_64.exe' }
+    # 二进制解析三档：ENGRAM_BIN 覆盖 → 公共位置（全机一份，与 ~/.engram 库同目录、
+    # 不隶属任何 CLI）→ 插件自带的兜底（离线 / 未装公共位置时）。
+    $shared = Join-Path $env:USERPROFILE '.engram\bin\engram-windows-x86_64.exe'
+    if     ($env:ENGRAM_BIN)   { $engram = $env:ENGRAM_BIN }
+    elseif (Test-Path $shared) { $engram = $shared }
+    else                       { $engram = Join-Path $pluginRoot 'bin\engram-windows-x86_64.exe' }
     if (-not (Test-Path $engram)) { exit 0 }
 
     $base = Join-Path $env:USERPROFILE '.engram\kimi'
